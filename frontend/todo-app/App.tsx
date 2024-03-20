@@ -1,4 +1,4 @@
-import theme from "@/components/utils/theme"
+import theme from "@/utils/theme"
 import Navigation from "@/navigation"
 import { ThemeProvider } from "@shopify/restyle"
 import { StatusBar } from "expo-status-bar"

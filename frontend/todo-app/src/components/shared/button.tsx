@@ -1,5 +1,6 @@
-import { Box, Text } from "../utils/theme"
+
 import { Pressable } from "react-native"
+import { Box, Text } from "../../utils/theme"
 
 type ButtonProps = {
   label: string

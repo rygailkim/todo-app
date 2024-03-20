@@ -1,6 +1,7 @@
-import theme, { Box, Text } from "../utils/theme"
+
+import theme, { Box, Text } from "../../utils/theme"
 import { FieldError } from "react-hook-form"
-import { StyleSheet, TextInput, TextInputProps } from "react-native"
+import { TextInput, TextInputProps } from "react-native"
 
 type InputProps = {
   label: string
@@ -32,5 +33,3 @@ const Input = ({ label, error, ...props }: InputProps) => {
 }
 
 export default Input
-
-const styles = StyleSheet.create({})

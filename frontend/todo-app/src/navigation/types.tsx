@@ -1,4 +1,4 @@
-
+import { ICategory, ITask } from "@/types"
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
 import {
   CompositeNavigationProp,
@@ -26,7 +26,7 @@ export type RootBottomTabParamList = {
 export type HomeStackParamList = {
   Home: undefined
   EditTask: {
-    task: undefined
+    task: ITask
   }
 }
 
@@ -36,7 +36,7 @@ export type CategoriesStackParamList = {
     id: string
   }
   CreateCategory: {
-    category?: undefined
+    category?: ICategory
   }
 }
 

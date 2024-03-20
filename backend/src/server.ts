@@ -8,6 +8,9 @@ const application = express()
 
 application.use(express.json())
 
+var cors = require('cors')
+application.use(cors({origin: true, credentials: true}));
+
 const PORT = 1337
 
 connectToDatabase()

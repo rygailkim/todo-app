@@ -10,6 +10,7 @@ import { Controller, useForm } from "react-hook-form"
 import { Pressable } from "react-native"
 import { IUser } from "@/types"
 import WelcomeScreen from "../welcome-screen"
+import { loginUser } from "@/services/api"
 
 const SignInScreen = () => {
   const navigation = useNavigation<AuthScreenNavigationType<"SignIn">>()
@@ -17,17 +18,32 @@ const SignInScreen = () => {
     navigation.navigate("SignUp")
   }
 
+  const { updateUser } = useUserGlobalStore()
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<IUser>({
+  } = useForm<Omit<IUser, "name">>({
     defaultValues: {
       email: "",
       password: "",
     },
   })
-  
+
+  const onSubmit = async (data: Omit<IUser, "name">) => {
+    try {
+      const { email, password } = data
+      const _user = await loginUser({
+        email: email.toLowerCase(),
+        password: password.toLowerCase(),
+      })
+      updateUser({
+        email: _user.email,
+        name: _user.name,
+      })
+    } catch (error) {}
+  }
+
   return (
     <SafeAreaWrapper>
       <Box flex={1} px="5.5" justifyContent="center">
@@ -79,7 +95,7 @@ const SignInScreen = () => {
         </Pressable>
         <Box mb="5.5" />
 
-        <Button label="Login" onPress={navigateToSignInScreen} uppercase />
+        <Button label="Login" onPress={handleSubmit(onSubmit)} uppercase />
       </Box>
     </SafeAreaWrapper>
   )

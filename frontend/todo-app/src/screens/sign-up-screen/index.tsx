@@ -2,6 +2,7 @@ import Button from "@/components/shared/button"
 import Input from "@/components/shared/input"
 import SafeAreaWrapper from "@/components/shared/safe-area-wrapper"
 import { AuthScreenNavigationType } from "@/navigation/types"
+import { registerUser } from "@/services/api"
 import { Box, Text } from "@/components/utils/theme"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
@@ -26,11 +27,26 @@ const SignUpScreen = () => {
     },
   })
 
+  const onSubmit = async (data: IUser) => {
+    try {
+      const { email, name, password } = data
+      /**
+       * register user
+       */
+      await registerUser({
+        email,
+        name,
+        password,
+      })
+      navigateToSignInScreen()
+    } catch (error) {}
+  }
+
   return (
     <SafeAreaWrapper>
       <Box flex={1} px="5.5" mt={"13"}>
         <Text variant="textXl" fontWeight="700">
-          Welcome to To Do App!
+          Welcome to Blossom!
         </Text>
         <Text variant="textXl" fontWeight="700" mb="6">
           Your journey starts here
@@ -98,7 +114,7 @@ const SignUpScreen = () => {
         </Pressable>
         <Box mb="5.5" />
 
-        <Button label="Register" onPress={navigateToSignInScreen} uppercase />
+        <Button label="Register" onPress={handleSubmit(onSubmit)} uppercase />
       </Box>
     </SafeAreaWrapper>
   )

@@ -20,8 +20,15 @@ const Category = ({ category }: CategoryProps) => {
     })
   }
 
+  const navigateToCategoryScreen = () => {
+    navigation.navigate("Category", {
+      id: category._id,
+
+    })
+  }
+
   return (
-      <Pressable>
+      <Pressable onPress={navigateToCategoryScreen}>
         <Box bg="lightGray" p="4" borderRadius="rounded-5xl">
           <Box
             flexDirection="row"

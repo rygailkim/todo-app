@@ -1,5 +1,6 @@
 import axios from "axios"
 import * as SecureStore from "expo-secure-store"
+import { err } from "react-native-svg"
 export const BASE_URL = "http://192.168.100.14:1337/"
 
 const TIME_OUT = 30000
@@ -30,6 +31,6 @@ axiosInstance.interceptors.request.use(async (req) => {
 })
 
 export const fetcher = (url: string) =>
-  axiosInstance.get(url).then((res) => res.data)
+  axiosInstance.get(url).then((res) => res.data).catch((err) => console.log(err))
 
 export default axiosInstance

@@ -9,7 +9,6 @@ import Loader from '@/components/shared/loader'
 import { Box, Text } from '@/utils/theme'
 import { ICategory, ITask } from '@/types'
 import NavigateBack from '@/components/shared/navigate-back'
-import TaskActions from '@/components/tasks/task-actions'
 
 type CategoryScreenRouteProp = RouteProp<CategoriesStackParamList, "Category">
 
@@ -56,7 +55,6 @@ const CategoryScreen = () => {
         </Box>
         <Box height={16}/>
 
-        <TaskActions categoryId={id} />
       </Box>
     </SafeAreaWrapper>
   )

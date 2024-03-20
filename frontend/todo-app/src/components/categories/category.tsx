@@ -13,6 +13,12 @@ type CategoryProps = {
 }
 
 const Category = ({ category }: CategoryProps) => {
+  const navigation = useNavigation<CategoriesNavigationType>()
+  const navigateToCreateCategory = () => {
+    navigation.navigate("CreateCategory", {
+      category: category,
+    })
+  }
 
   return (
       <Pressable>
@@ -30,7 +36,7 @@ const Category = ({ category }: CategoryProps) => {
                 {category.name}
               </Text>
             </Box>
-            <Pressable>
+            <Pressable onPress={navigateToCreateCategory}>
               <Entypo name="dots-three-vertical" size={16} />
             </Pressable>
           </Box>

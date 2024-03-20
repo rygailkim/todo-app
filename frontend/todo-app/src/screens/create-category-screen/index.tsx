@@ -1,16 +1,19 @@
+import Button from "@/components/shared/button"
+import NavigateBack from "@/components/shared/navigate-back"
+import SafeAreaWrapper from "@/components/shared/safe-area-wrapper"
+import { CategoriesStackParamList } from "@/navigation/types"
+import axiosInstance, { BASE_URL } from "@/services/config"
+import { ICategory, ICategoryRequest, IColor, IIcon } from "@/types"
+import { getColors, getIcons } from "@/utils/helpers"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
+import { Box, Text, Theme } from "@/utils/theme"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import { useTheme } from "@shopify/restyle"
+import React, { useState } from "react"
+import { Pressable, TextInput } from "react-native"
+import { useSWRConfig } from "swr"
 
-import React, { useState } from 'react'
-import SafeAreaWrapper from '@/components/shared/safe-area-wrapper'
-import theme, { Box, Text, Theme } from '@/utils/theme'
-import NavigateBack from '@/components/shared/navigate-back'
-import { Pressable, TextInput } from 'react-native'
-import { ICategory, ICategoryRequest, IColor, IIcon } from '@/types'
-import { getColors, getIcons } from '@/utils/helpers'
-import Button from '@/components/shared/button'
-import axiosInstance, { BASE_URL } from '@/services/config'
-import { useTheme } from '@shopify/restyle'
-import useSWRMutation from 'swr/mutation'
-import { useSWRConfig } from 'swr'
+import useSWRMutation from "swr/mutation"
 
 const COLORS = getColors()
 const ICONS = getIcons()
@@ -19,62 +22,137 @@ const DEFAULT_COLOR = COLORS[0]
 const DEFAULT_ICON = ICONS[0]
 
 const createCategoryRequest = async (
-    url: string,
-    { arg }: { arg: ICategoryRequest }
-  ) => {
+  url: string,
+  { arg }: { arg: ICategoryRequest }
+) => {
+  try {
+    await axiosInstance.post(url, {
+      ...arg,
+    })
+  } catch (error) {
+    console.log("error in createCategoryRequest", error)
+    throw error
+  }
+}
+const updateCategoryRequest = async (
+  url: string,
+  { arg }: { arg: ICategoryRequest }
+) => {
+  try {
+    await axiosInstance.put(url, {
+      ...arg,
+    })
+  } catch (error) {
+    console.log("error in createCategoryRequest", error)
+    throw error
+  }
+}
+
+const deleteCategoryRequest = async (
+  url: string,
+  { arg }: { arg: { id: string } }
+) => {
+  try {
+    await axiosInstance.delete(url + "/" + arg.id)
+  } catch (error) {
+    console.log("error in deleteCategoryRequest", error)
+    throw error
+  }
+}
+
+type CreateCategoryRouteTypes = RouteProp<
+  CategoriesStackParamList,
+  "CreateCategory"
+>
+
+const CreateCategoryScreen = () => {
+  const theme = useTheme<Theme>()
+  const navigation = useNavigation()
+
+  const route = useRoute<CreateCategoryRouteTypes>()
+
+  const isEditing = route.params.category ? true : false
+
+  const { trigger, isMutating } = useSWRMutation(
+    "categories/create",
+    createCategoryRequest
+  )
+
+  const { trigger: updateTrigger } = useSWRMutation(
+    "categories/update",
+    updateCategoryRequest
+  )
+
+  const { trigger: deleteTrigger } = useSWRMutation(
+    "categories/",
+    deleteCategoryRequest
+  )
+
+  const { mutate } = useSWRConfig()
+
+  console.log(`route.params`, JSON.stringify(route.params, null, 2))
+
+  const [newCategory, setNewCategory] = useState<
+    Omit<ICategory, "_id" | "user" | "isEditable">
+  >({
+    name: route.params.category?.name ?? "",
+    color: route.params.category?.color ?? DEFAULT_COLOR,
+    icon: route.params.category?.icon ?? DEFAULT_ICON,
+  })
+
+  const createNewCategory = async () => {
     try {
-      await axiosInstance.post(url, {
-        ...arg,
-      })
+      if (isEditing) {
+        const updatedCategoryItem = {
+          ...route.params.category,
+          ...newCategory,
+        }
+        await updateTrigger({
+          ...updatedCategoryItem,
+        })
+      } else {
+        await trigger({
+          ...newCategory,
+        })
+      }
+      await mutate(BASE_URL + "categories")
+      navigation.goBack()
     } catch (error) {
-      console.log("error in createCategoryRequest", error)
+      console.log("error in createNewCategory", error)
       throw error
     }
   }
 
-const CreateCategoryScreen = () => {
-    const theme = useTheme<Theme>()
-
-    const {trigger, isMutating} = useSWRMutation("categories/create", createCategoryRequest)
-
-    const {mutate} = useSWRConfig()
-
-    const [newCategory, setNewCategory] = useState<
-    Omit<ICategory, "_id" | "user" | "isEditable">>({
-        name: "",
-        color: DEFAULT_COLOR,
-        icon: DEFAULT_ICON,
+  const updateColor = (color: IColor) => {
+    setNewCategory((prev) => {
+      return {
+        ...prev,
+        color,
+      }
     })
+  }
+  const updateIcon = (icon: IIcon) => {
+    setNewCategory((prev) => {
+      return {
+        ...prev,
+        icon,
+      }
+    })
+  }
 
-    const createNewCategory = async () => {
-        try {
-            console.log(`newCategory`, JSON.stringify(newCategory, null, 2))
-            trigger({
-                ...newCategory,
-            })
-            await mutate(BASE_URL + "categories")
-        } catch (error) {
-          console.log("error in createNewCategory", error)
-          throw error
-        }
-      }
-
-      const updateColor = (color: IColor) => {
-        setNewCategory((prev) => {
-          return {
-            ...prev,
-            color,
-          }
+  const deleteCategory = async () => {
+    try {
+      if (isEditing && route.params.category?._id)
+        await deleteTrigger({
+          id: route.params.category?._id,
         })
-      }
-      const updateIcon = (icon: IIcon) => {
-        setNewCategory((prev) => {
-          return {
-            ...prev,
-            icon,
-          }
-        })
-      }
+      await mutate(BASE_URL + "categories")
+      navigation.goBack()
+    } catch (error) {
+      console.log("error in deleteCategor", error)
+      throw error
+    }
+  }
 
   return (
     <SafeAreaWrapper>
@@ -86,6 +164,15 @@ const CreateCategoryScreen = () => {
           alignItems="center"
         >
           <NavigateBack />
+          {isEditing && (
+            <Pressable onPress={deleteCategory}>
+              <MaterialCommunityIcons
+                name="delete"
+                size={24}
+                color={theme.colors.rose500}
+              />
+            </Pressable>
+          )}
         </Box>
         <Box height={16} />
         <Box bg="gray250" borderRadius="rounded-2xl">
@@ -190,7 +277,7 @@ const CreateCategoryScreen = () => {
         </Box>
         <Box position="absolute" bottom={4} left={0} right={0}>
           <Button
-            label={"Create New Category"}
+            label={isEditing ? "Edit Category" : "Create New Category"}
             onPress={createNewCategory}
           />
         </Box>

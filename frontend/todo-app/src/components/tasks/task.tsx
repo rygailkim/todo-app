@@ -51,8 +51,14 @@ const Task = ({task}: TaskProps) => {
       }
     }
 
+    const navigateToEditTask = () => {
+        navigation.navigate("EditTask", {
+          task,
+        })
+      }
+
     return(
-        <Pressable onPress={toggleTaskStatus}>
+        <Pressable onPress={toggleTaskStatus} onLongPress={navigateToEditTask}>
             <Box p="4" bg="lightGray" borderRadius="rounded-5xl" flexDirection="row">
                 <Box flexDirection="row" alignItems="center">
                     <Box height={26} width={26} bg={task.isCompleted ? "gray9" : "gray300"}
